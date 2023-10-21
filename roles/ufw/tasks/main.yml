@@ -1,0 +1,6 @@
+---
+- name: Allow HTTP traffic through the firewall
+  ufw:
+    rule: allow
+    port: '80'
+    proto: tcp

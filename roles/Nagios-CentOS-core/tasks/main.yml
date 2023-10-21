@@ -1,0 +1,84 @@
+---
+- name: Epel installations
+  dnf:
+    name: epel-release
+    state: latest
+
+- name: install pip
+  become: yes
+  ansible.builtin.package:
+    name: python-pip
+    state: present
+
+- name: Install required packages for plugins
+  package:
+    name:
+      - autoconf
+      - automake
+      - gd
+      - gcc
+      - make
+      - perl
+      - gcc-c++
+      - gd-devel
+      - glibc
+      - httpd
+      - make
+      - glibc-common
+      - openssl-devel
+      - unzip
+      - php
+      - libtool
+    state: latest
+  when: ansible_distribution == "CentOS"
+
+- name: install passlib
+  pip:
+    name: passlib
+
+- name: add nagios user
+  user:
+    name: nagios
+    state: present
+
+- name: add nagcmd group
+  group:
+    name: nagcmd
+    state: present
+
+- name: add nagios to nagcmd group
+  user:
+    name: nagios
+    groups: nagcmd
+    append: yes
+
+- name: add apache to nagcmd group
+  user:
+    name: apache
+    groups: nagcmd
+    append: yes
+
+- name: nagios directory
+  file:
+    path: ~/nagios
+    state: directory
+
+- name: Download Nagios Core
+  unarchive:
+    src: https://github.com/NagiosEnterprises/nagioscore/archive/nagios-4.4.6.tar.gz
+    dest: ~/nagios
+    remote_src: yes
+    mode: 0777
+    owner: root
+    group: root
+
+- name: Compile and install Nagios Core
+  shell: |
+     cd ~/nagios/nagioscore-**
+     ./configure
+     make all
+     make install
+     make install-init
+     make install-commandmode
+     make install-config
+     make install-webconf
