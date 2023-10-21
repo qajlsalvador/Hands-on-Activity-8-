@@ -1,0 +1,49 @@
+---
+- hosts: all
+  become: true
+  pre_tasks:
+
+  - name: Update APT cache CentOS
+    dnf:
+      update_cache: yes
+    when: ansible_distribution == "CentOS"
+
+  - name: Update APT cache Ubuntu
+    apt:
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+- hosts: Ubuntu
+  become: true
+  roles:
+    - Nagios-Core
+
+- hosts: Ubuntu
+  become: true
+  roles:
+    - Nagios-Plugins
+
+- hosts: Ubuntu
+  become: true
+  roles:
+    - Nagios-Web
+
+- hosts: Ubuntu
+  become: true
+  roles:
+    - ufw
+
+- hosts: CentOS
+  become: true
+  roles:
+    - Nagios-CentOS-core
+
+- hosts: CentOS
+  become: true
+  roles:
+    - Nagios-CentOS-Plugins
+
+- hosts: CentOS
+  become: true
+  roles:
+    - Nagios-CentOS-Web
